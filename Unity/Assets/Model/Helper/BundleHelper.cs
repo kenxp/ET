@@ -13,24 +13,29 @@ namespace ETModel
 			{
 				try
 				{
-					using (BundleDownloaderComponent bundleDownloaderComponent = Game.Scene.AddComponent<BundleDownloaderComponent>())
+                    Game.EventSystem.Run(EventIdType.LoadingBegin);
+                    using (BundleDownloaderComponent bundleDownloaderComponent = Game.Scene.AddComponent<BundleDownloaderComponent>())
 					{
 						await bundleDownloaderComponent.StartAsync();
-						
-						Game.EventSystem.Run(EventIdType.LoadingBegin);
 						
 						await bundleDownloaderComponent.DownloadAsync();
 					}
 					
-					Game.EventSystem.Run(EventIdType.LoadingFinish);
-					
 					Game.Scene.GetComponent<ResourcesComponent>().LoadOneBundle("StreamingAssets");
 					ResourcesComponent.AssetBundleManifestObject = (AssetBundleManifest)Game.Scene.GetComponent<ResourcesComponent>().GetAsset("StreamingAssets", "AssetBundleManifest");
-				}
+
+                    Game.EventSystem.Run(EventIdType.LoadingFinish);
+                    await Game.Scene.GetComponent<TimerComponent>().WaitAsync(1000);
+                }
 				catch (Exception e)
 				{
 					Log.Error(e);
-				}
+                    Game.EventSystem.Run(EventIdType.Loading, e.Message, -1);
+                    while (true)
+                    {
+                        await Game.Scene.GetComponent<TimerComponent>().WaitAsync(3000);
+                    }
+                }
 
 			}
 		}
@@ -43,7 +48,7 @@ namespace ETModel
 				return MD5Helper.FileMD5(path);
 			}
 			
-			if (streamingVersionConfig.FileInfoDict.ContainsKey(bundleName))
+			if (false && streamingVersionConfig!=null && streamingVersionConfig.FileInfoDict.ContainsKey(bundleName))
 			{
 				return streamingVersionConfig.FileInfoDict[bundleName].MD5;	
 			}

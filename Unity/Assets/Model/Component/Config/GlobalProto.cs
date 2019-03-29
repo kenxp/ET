@@ -19,7 +19,7 @@
 #else
 			url += "PC/";
 #endif
-			Log.Debug(url);
+			//Log.Debug(url);
 			return url;
 		}
 	}

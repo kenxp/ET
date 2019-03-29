@@ -29,6 +29,39 @@ namespace ETModel
 			appdomain.DelegateManager.RegisterFunctionDelegate<Google.Protobuf.Adapt_IMessage.Adaptor>();
 			appdomain.DelegateManager.RegisterMethodDelegate<Google.Protobuf.Adapt_IMessage.Adaptor>();
 
+            // FairyGUI
+            appdomain.DelegateManager.RegisterDelegateConvertor<FairyGUI.EventCallback0>((act) =>
+            {
+                return new FairyGUI.EventCallback0(() =>
+                {
+                    ((Action)act)();
+                });
+            });
+
+            appdomain.DelegateManager.RegisterDelegateConvertor<ETModel.DoShowAnimationEvent>((act) =>
+            {
+                return new ETModel.DoShowAnimationEvent(() =>
+                {
+                    ((Action
+                                    ) act
+                            )();
+                });
+            });
+            appdomain.DelegateManager.RegisterDelegateConvertor<ETModel.OnHideEvent>((act) =>
+            {
+                return new ETModel.OnHideEvent(() => { ((Action) act)(); });
+            });
+            appdomain.DelegateManager.RegisterDelegateConvertor<ETModel.DoHideAnimationEvent>((act) =>
+            {
+                return new ETModel.DoHideAnimationEvent(() =>
+                {
+                    ((Action
+                                    ) act
+                            )();
+                });
+            });
+			//--FairyGUI End
+
 			CLRBindings.Initialize(appdomain);
 
 			// 注册适配器

@@ -26,8 +26,9 @@ namespace ETHotfix
 				ETModel.Game.Hotfix.LateUpdate = () => { LateUpdate(); };
 				ETModel.Game.Hotfix.OnApplicationQuit = () => { OnApplicationQuit(); };
 				
-				Game.Scene.AddComponent<UIComponent>();
-				Game.Scene.AddComponent<OpcodeTypeComponent>();
+				//Game.Scene.AddComponent<UIComponent>();
+                Game.Scene.AddComponent<UIManagerComponent>();//改用FairyGUI
+                Game.Scene.AddComponent<OpcodeTypeComponent>();
 				Game.Scene.AddComponent<MessageDispatcherComponent>();
 
 				// 加载热更配置

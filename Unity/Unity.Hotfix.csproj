@@ -126,6 +126,15 @@
     <Compile Include="Assets\Hotfix\Module\UI\UI.cs" />
     <Compile Include="Assets\Hotfix\Module\UI\UIComponent.cs" />
     <Compile Include="Assets\Hotfix\Module\UI\UIType.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Event\InitSceneStart_CreateLoginUI.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Event\TestHotfixSubscribMonoEvent_LogString.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Module\SUIFW\BaseUIForms.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Module\SUIFW\Common\SysDefine.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Module\SUIFW\Common\UI.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Module\SUIFW\FUIType.cs" />
+    <Compile Include="Assets\Hotfix\zGame\Module\SUIFW\UIManagerComponent.cs" />
+    <Compile Include="Assets\Hotfix\zGame\UI\AskPanelUI.cs" />
+    <Compile Include="Assets\Hotfix\zGame\UI\LoginSceneUI_FairyGUI.cs" />
     <None Include="Assets\Hotfix\Unity.Hotfix.asmdef" />
     <Reference Include="UnityEngine.AIModule">
       <HintPath>F:/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

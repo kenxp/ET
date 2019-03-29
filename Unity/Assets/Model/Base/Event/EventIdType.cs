@@ -19,7 +19,8 @@
 		public const string SceneChange = "SceneChange";
 		public const string FrameUpdate = "FrameUpdate";
 		public const string LoadingBegin = "LoadingBegin";
-		public const string LoadingFinish = "LoadingFinish";
+        public const string Loading = "Loading";
+        public const string LoadingFinish = "LoadingFinish";
 		public const string TestHotfixSubscribMonoEvent = "TestHotfixSubscribMonoEvent";
 		public const string MaxModelEvent = "MaxModelEvent";
 	}

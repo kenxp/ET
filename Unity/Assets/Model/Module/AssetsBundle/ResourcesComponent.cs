@@ -178,7 +178,7 @@ namespace ETModel
 
 		private readonly Dictionary<string, Dictionary<string, UnityEngine.Object>> resourceCache = new Dictionary<string, Dictionary<string, UnityEngine.Object>>();
 
-		private readonly Dictionary<string, ABInfo> bundles = new Dictionary<string, ABInfo>();
+		public readonly Dictionary<string, ABInfo> bundles = new Dictionary<string, ABInfo>();
 
 		public override void Dispose()
 		{

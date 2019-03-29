@@ -27,13 +27,17 @@ namespace ETModel
 
 		public long TotalSize;
 
-		public HashSet<string> downloadedBundles;
+        public string HumanSize;
+        public bool downloading = false;
+
+        public HashSet<string> downloadedBundles;
 
 		public string downloadingBundle;
 
 		public UnityWebRequestAsync webRequest;
+        private long alreadyDownload = 0;
 
-		public async ETTask StartAsync()
+        public async ETTask StartAsync()
 		{
 			// 获取远程的Version.txt
 			string versionUrl = "";
@@ -42,7 +46,7 @@ namespace ETModel
 				using (UnityWebRequestAsync webRequestAsync = ComponentFactory.Create<UnityWebRequestAsync>())
 				{
 					versionUrl = GlobalConfigComponent.Instance.GlobalProto.GetUrl() + "StreamingAssets/" + "Version.txt";
-					//Log.Debug(versionUrl);
+					Log.Debug("version URL："+versionUrl);
 					await webRequestAsync.DownloadAsync(versionUrl);
 					remoteVersionConfig = JsonHelper.FromJson<VersionConfig>(webRequestAsync.Request.downloadHandler.text);
 					//Log.Debug(JsonHelper.ToJson(this.VersionConfig));
@@ -55,16 +59,19 @@ namespace ETModel
 			}
 
 			// 获取streaming目录的Version.txt
-			VersionConfig streamingVersionConfig;
+			VersionConfig streamingVersionConfig = null;
 			string versionPath = Path.Combine(PathHelper.AppResPath4Web, "Version.txt");
-			using (UnityWebRequestAsync request = ComponentFactory.Create<UnityWebRequestAsync>())
-			{
-				await request.DownloadAsync(versionPath);
-				streamingVersionConfig = JsonHelper.FromJson<VersionConfig>(request.Request.downloadHandler.text);
-			}
-			
-			// 删掉远程不存在的文件
-			DirectoryInfo directoryInfo = new DirectoryInfo(PathHelper.AppHotfixResPath);
+            Log.Debug("Local version file:"+versionPath);
+            if (File.Exists(versionPath)) { 
+			    using (UnityWebRequestAsync request = ComponentFactory.Create<UnityWebRequestAsync>())
+			    {
+				    await request.DownloadAsync(versionPath);
+				    streamingVersionConfig = JsonHelper.FromJson<VersionConfig>(request.Request.downloadHandler.text);
+			    }
+            }
+
+            // 删掉远程不存在的文件
+            DirectoryInfo directoryInfo = new DirectoryInfo(PathHelper.AppHotfixResPath);
 			if (directoryInfo.Exists)
 			{
 				FileInfo[] fileInfos = directoryInfo.GetFiles();
@@ -100,9 +107,31 @@ namespace ETModel
 				this.bundles.Enqueue(fileVersionInfo.File);
 				this.TotalSize += fileVersionInfo.Size;
 			}
+            HumanSize = GetLengthString(TotalSize);
+            string msg = $"需要更新{bundles.Count}个文件,共{HumanSize}";
+            Log.Debug(msg);
+            if (bundles.Count > 0)
+            {
+                Game.EventSystem.Run(EventIdType.Loading, msg, 0);
+                StartAsyncProgress().Coroutine();
+            }
 		}
+        public async ETVoid StartAsyncProgress()
+        {
+            TimerComponent timerComponent = Game.Scene.GetComponent<TimerComponent>();
+            while (this.bundles.Count>0)
+            {
+                await timerComponent.WaitAsync(1000);
+                int val = this.Progress;
+                if (this.bundles.Count > 0 && alreadyDownload >0) { 
+                    string fin = GetLengthString(alreadyDownload);
+                    
+                    Game.EventSystem.Run(EventIdType.Loading, $"下载中 {fin}/{HumanSize}", val);
+                }
 
-		public int Progress
+            }
+        }
+        public int Progress
 		{
 			get
 			{
@@ -121,7 +150,9 @@ namespace ETModel
 				{
 					alreadyDownloadBytes += (long)this.webRequest.Request.downloadedBytes;
 				}
-				return (int)(alreadyDownloadBytes * 100f / this.TotalSize);
+                this.alreadyDownload = alreadyDownloadBytes;
+
+                return (int)(alreadyDownloadBytes * 100f / this.TotalSize);
 			}
 		}
 
@@ -157,7 +188,8 @@ namespace ETModel
 								{
 									fs.Write(data, 0, data.Length);
 								}
-							}
+                                
+                            }
 						}
 						catch (Exception e)
 						{
@@ -170,12 +202,32 @@ namespace ETModel
 					this.downloadedBundles.Add(this.downloadingBundle);
 					this.downloadingBundle = "";
 					this.webRequest = null;
-				}
+                }
 			}
 			catch (Exception e)
 			{
 				Log.Error(e);
 			}
 		}
-	}
+
+        public string GetLengthString(long length)
+        {
+            if (length < 1024)
+            {
+                return string.Format("{0} Bytes", length.ToString());
+            }
+
+            if (length < 1024 * 1024)
+            {
+                return string.Format("{0} KB", (length / 1024f).ToString("F2"));
+            }
+
+            if (length < 1024 * 1024 * 1024)
+            {
+                return string.Format("{0} MB", (length / 1024f / 1024f).ToString("F2"));
+            }
+
+            return string.Format("{0} GB", (length / 1024f / 1024f / 1024f).ToString("F2"));
+        }
+    }
 }
